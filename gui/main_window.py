@@ -1,6 +1,11 @@
+from time import sleep
+
 import pygame
 import sys
 from enum import Enum
+import numpy as np
+from back_end.dto import SquareType, PieceType, Board
+from back_end.state_generator import StateGenerator
 from typing import List
 
 
@@ -20,28 +25,6 @@ background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_WIDTH))
 screen.blit(background, (0, 0))
 
 
-# dama üzerinde her bir kare için tipler...
-class SquareType(Enum):
-    """
-    1. bit taş olup olmadığını
-    2. bit taşın 1. oyuncuya ait olup olmadığını
-    3. bit taşın dama olup olmadığını gösterir
-    """
-    O = 0b00000000      # 0 -> taş yok
-    w = 0b00000001      # 1 -> taş var, 2. oyuncu(siyah), piyon
-    W = 0b00000101      # 5 -> taş var, 2. oyuncu(siyah), dama
-    m = 0b00000011      # 3 -> taş var, 1. oyuncu(beyaz), piyon
-    M = 0b00000111      # 7 -> tav var, 1. oyuncu(beyaz), dama
-
-
-# taşların tipleri...
-class PieceType(Enum):
-    w = 0b00000001
-    W = 0b00000101
-    m = 0b00000011
-    M = 0b00000111
-
-
 # arka planın üzerine taşlar daire olarak çiziliyor,
 # bu içlemi hızlandırmak için hashmap...
 PIECE_IMAGE_MAP = {
@@ -52,34 +35,12 @@ PIECE_IMAGE_MAP = {
 }
 
 
-
-# Tavlın tüm kareleri ve karelerin tipleri, bir durumdur
-STATE = [
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-            [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
-            [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-            [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
-            [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-        ]
+board = Board()
+state_generator = StateGenerator(board)
+state_generator.update_selectable_pieces()
 
 
-class Piece:
-    def __init__(self, type: PieceType, x_pos: int, y_pos: int):
-        self.type = type
-        self.x_pos = x_pos
-        self.y_pos = y_pos
-
-
-pieces = [
-    Piece(PieceType.w, 160, 260),
-    Piece(PieceType.m, 760, 560)
-]
-
-
-def get_clicked_piece(mouse_pos) -> SquareType | None:
+def get_clicked_piece(mouse_pos) -> int | None:
 
     """
     İlk önce tıklanan satır ve stunu bulup o karenin merkezini bulur.
@@ -92,25 +53,43 @@ def get_clicked_piece(mouse_pos) -> SquareType | None:
 
     col = int((mouse_pos[0] - 50) / 100)
     row = int((mouse_pos[1] - 50) / 100)
-    if STATE[row][col] == SquareType.O:
+    if board.state[row][col] == SquareType.O:
         return
 
     center_x = col * 100 + 100
     center_y = row * 100 + 100
-    print(f"center_x:{center_x}, center_y:{center_y}")
-    print(f"col:{col}, row:{row}")
-    print(f"piece_type:{STATE[row][col].name}")
+    # print(f"center_x:{center_x}, center_y:{center_y}")
+    # print(f"col:{col}, row:{row}")
+    # print(f"piece_type:{board.state[row][col].name}")
     distance = ((mouse_pos[0] - center_x) ** 2 + (mouse_pos[1] - center_y) ** 2) ** 0.5
     if distance <= 40:
-        return STATE[row][col]
+        return row * 8 + col
 
 
 def drive_pieces():
     for y in range(8):
         for x in range(8):
-            if STATE[y][x] != SquareType.O:
-                image = PIECE_IMAGE_MAP[PieceType[STATE[y][x].name]]
+            if board.state[y][x] != SquareType.O:
+                image = PIECE_IMAGE_MAP[PieceType((PieceType[SquareType(board.state[y][x]).name]))]
                 screen.blit(image, (x * 100 + 60, y * 100 + 60))
+
+
+def mark_squares_that_stone_can_move(x, y):
+    color = (0, 255, 0, 50)  # Saydam yeşil (RGBA)
+
+    # Saydam yüzey oluştur
+    overlay_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_WIDTH), pygame.SRCALPHA)
+
+    # Saydam yüzey üzerine kare çiz
+    pygame.draw.rect(overlay_surface, color, (x, y, 100, 100))
+
+    # Ana yüzeyin üzerine saydam yüzeyi yerleştir
+    screen.blit(overlay_surface, (0, 0))
+
+    # Ekranı güncelle
+    pygame.display.update()
+
+    sleep(2)
 
 
 def main():
@@ -124,8 +103,15 @@ def main():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                clicled_piece = get_clicked_piece(mouse_pos)
-                print(clicled_piece)
+                pos = get_clicked_piece(mouse_pos)
+                if pos:
+                    print(f"x: {pos % 8}, y:{pos // 8}")
+                    if pos in board.indexes_of_selectable_pieces:
+                        mark_squares_that_stone_can_move((pos % 8) * 100 + 50, (pos // 8) * 100 + 50)
+                        print("tıklanabilir")
+                        print()
+                    else:
+                        print(board.indexes_of_selectable_pieces)
 
         # Arka planı tekrar çiz
         screen.blit(background, (0, 0))

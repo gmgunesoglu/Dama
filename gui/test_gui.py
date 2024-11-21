@@ -38,7 +38,7 @@ clock = pygame.time.Clock()
 def apply_overlay(surface, x, y, angle, width, height, color):
     # Nesnenin bulunduğu açıya göre boyama yapılacak alanı hesapla
     length = 800  # Boyama alanının uzunluğu, ekran boyunca devam etmesi için
-    offset = 5  # Boyama kalınlığı
+    offset = 50  # Boyama kalınlığı
 
     # 90 derece aralıklarla çizgi çizelim
     for i in range(0, 360, 90):  # 90 derece artışla
@@ -49,7 +49,7 @@ def apply_overlay(surface, x, y, angle, width, height, color):
         y2 = y1 + length * math.sin(math.radians(i + angle))
 
         # Boyama çizgilerini, nesnenin boyutuna göre genişletelim
-        pygame.draw.rect(surface, color, (x - width // 2, y - height // 2, width, height), 0)  # Nesneyi genişletmek
+        # pygame.draw.rect(surface, color, (x - width // 2, y - height // 2, width, height), 0)  # Nesneyi genişletmek
         pygame.draw.line(surface, color, (x1, y1), (x2, y2), offset)  # Çizgi uzunluğu ve kalınlığı
 
 
