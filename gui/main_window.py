@@ -1,10 +1,8 @@
-from time import sleep
-
 import pygame
 import sys
 from enum import Enum
 import numpy as np
-from back_end.dto import SquareType, PieceType, Board
+from back_end.dto import SquareType, PieceType, Board, MoveNode
 from back_end.state_generator import StateGenerator
 from typing import List
 
@@ -40,32 +38,36 @@ state_generator = StateGenerator(board)
 state_generator.update_selectable_pieces()
 
 
-def get_clicked_piece(mouse_pos) -> int | None:
+def get_col_row(mouse_pos) -> tuple[int, int] |None:
+    if mouse_pos[0] > 850 or mouse_pos[0] < 50 or mouse_pos[1] > 850 or mouse_pos[1] < 50:
+        return
+    col = int((mouse_pos[0] - 50) / 100)
+    row = int((mouse_pos[1] - 50) / 100)
+    return col, row
+
+
+def get_moveable_piece(mouse_pos) -> tuple[int, int] | None:
 
     """
     İlk önce tıklanan satır ve stunu bulup o karenin merkezini bulur.
-    Eğer tıklanan kare de taş varsa ve tıklama taşın üzerine denk geliyorsa
-    Taş seçilir ve döndürülür
+    Eğer tıklanan kare de taş varsa, taş oyuncunun taşıysa ve oynanabilir ise
+    taşın olduğu stun(x) satır(y) döner
     """
-
-    if mouse_pos[0] > 840 or mouse_pos[0] < 60 or mouse_pos[1] > 840 or mouse_pos[1] < 60:
+    pos = get_col_row(mouse_pos)
+    if not pos:
         return
 
-    col = int((mouse_pos[0] - 50) / 100)
-    row = int((mouse_pos[1] - 50) / 100)
-    if board.state[row][col] == SquareType.O:
+    col, row = pos
+    if board.state[row][col].value & SquareType.m.value != SquareType.m.value:
         return
-
     center_x = col * 100 + 100
     center_y = row * 100 + 100
-    # print(f"center_x:{center_x}, center_y:{center_y}")
-    # print(f"col:{col}, row:{row}")
-    # print(f"piece_type:{board.state[row][col].name}")
     distance = ((mouse_pos[0] - center_x) ** 2 + (mouse_pos[1] - center_y) ** 2) ** 0.5
     if distance <= 40:
-        return row * 8 + col
+        return col, row
 
 
+""" Taşların şekillerini çizer """
 def drive_pieces():
     for y in range(8):
         for x in range(8):
@@ -74,26 +76,28 @@ def drive_pieces():
                 screen.blit(image, (x * 100 + 60, y * 100 + 60))
 
 
-def mark_squares_that_stone_can_move(x, y):
-    color = (0, 255, 0, 50)  # Saydam yeşil (RGBA)
-
-    # Saydam yüzey oluştur
-    overlay_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_WIDTH), pygame.SRCALPHA)
-
-    # Saydam yüzey üzerine kare çiz
-    pygame.draw.rect(overlay_surface, color, (x, y, 100, 100))
-
-    # Ana yüzeyin üzerine saydam yüzeyi yerleştir
-    screen.blit(overlay_surface, (0, 0))
-
-    # Ekranı güncelle
-    pygame.display.update()
-
-    sleep(2)
+""" Oynayabilir bir taş seçildiğinde hangi karelere hareket ettirebileceği gösterilir """
+def select_and_mark_squares_that_piece_can_move(clicked_piece: tuple[int, int] | None) -> List[tuple[int, int]]:
+    squares_that_piece_can_move: List[tuple[int, int]] = []
+    if clicked_piece and clicked_piece in board.moves:
+        move_nodes = board.moves[clicked_piece]
+        for move_node in move_nodes:
+            x, y = move_node.next_loc
+            squares_that_piece_can_move.append((x, y))
+            color = (0, 255, 0, 50)  # Saydam yeşil (RGBA)
+            # Saydam yüzey oluştur
+            overlay_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_WIDTH), pygame.SRCALPHA)
+            # Saydam yüzey üzerine kare çiz
+            pygame.draw.rect(overlay_surface, color, (x * 100 + 50, y * 100 + 50, 100, 100))
+            # Ana yüzeyin üzerine saydam yüzeyi yerleştir
+            screen.blit(overlay_surface, (0, 0))
+    return squares_that_piece_can_move
 
 
 def main():
     clock = pygame.time.Clock()
+    selected_movable_piece: tuple[int, int] | None = None
+    squares_that_piece_can_move: List[tuple[int, int]] = []
 
     # Ana döngü
     while True:
@@ -103,26 +107,25 @@ def main():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                pos = get_clicked_piece(mouse_pos)
-                if pos:
-                    print(f"x: {pos % 8}, y:{pos // 8}")
-                    if pos in board.indexes_of_selectable_pieces:
-                        mark_squares_that_stone_can_move((pos % 8) * 100 + 50, (pos // 8) * 100 + 50)
-                        print("tıklanabilir")
-                        print()
-                    else:
-                        print(board.indexes_of_selectable_pieces)
+                if selected_movable_piece:
+                    col_row = get_col_row(mouse_pos)
+                    if col_row and col_row in squares_that_piece_can_move:
+                        # normal hamle yapabilen bir taş
+                        print("burada taş oynamalı")
+                selected_movable_piece = get_moveable_piece(mouse_pos)
 
         # Arka planı tekrar çiz
         screen.blit(background, (0, 0))
         # Arka planın üzerine taşları çiz
         drive_pieces()
+        # oynanabilir bir taş seçilmişse oynayabileceği kareleri yeşil belirt ve oynanabilir karelerin konumları döndür
+        squares_that_piece_can_move = select_and_mark_squares_that_piece_can_move(selected_movable_piece)
 
         # Ekranı güncelle
         pygame.display.update()
 
         # FPS sınırı
-        clock.tick(70)
+        clock.tick(10)
 
 
 if __name__ == "__main__":

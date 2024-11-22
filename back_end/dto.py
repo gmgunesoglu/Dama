@@ -25,20 +25,29 @@ class PieceType(Enum):
     M = 0b00000111
 
 
+class MoveNode:
+    def __init__(self, next_state, init_loc: tuple[int, int], next_loc: tuple[int, int]):
+        self.next_state = next_state
+        self.init_loc = init_loc
+        self.next_loc = next_loc
+        self.next_nodes: List[MoveNode] = []
+
+
 class Board:
 
     def __init__(self):
         self.state = np.array([
             [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
             [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
-            [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+            [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.O, SquareType.w, SquareType.w],
+            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O],
+            [SquareType.O, SquareType.m, SquareType.O, SquareType.O, SquareType.O, SquareType.M, SquareType.O, SquareType.O],
             [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
             [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
             [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
         ], dtype=Enum)
-        self.indexes_of_selectable_pieces = set()
+        # self.normal_move_map: Dict[tuple[int, int], List[tuple[int, int]]] = {}
+        self.moves: Dict[tuple[int, int], List[MoveNode]] = {}
 
     def update_state(self, state: np.ndarray):
         if state.shape != (8, 8):

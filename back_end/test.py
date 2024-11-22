@@ -1,9 +1,7 @@
-def selam_ver(isim):
-    return f"Merhaba, {isim}!"
+tuple_1 = (1, 7)
+tuple_2 = (1, 2)
 
-def fonksiyonu_cagir(fonksiyon, arg):
-    return fonksiyon(arg)
-
-# selam_ver fonksiyonunu, fonksiyonu_cagir fonksiyonuna gönderiyoruz
-sonuc = fonksiyonu_cagir(selam_ver, "Ali")
-print(sonuc)  # Çıktı: Merhaba, Ali!
+the_list = {tuple_1: 1,
+            tuple_2: 2}
+print(the_list)
+print(the_list[(1, 7)])
