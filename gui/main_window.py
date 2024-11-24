@@ -3,7 +3,7 @@ import sys
 from enum import Enum
 import numpy as np
 from back_end.dto import SquareType, PieceType, Board, MoveNode
-from back_end.state_generator import StateGenerator
+from back_end.state_generator import MoveGenerator
 from typing import List
 
 
@@ -34,8 +34,8 @@ PIECE_IMAGE_MAP = {
 
 
 board = Board()
-state_generator = StateGenerator(board)
-state_generator.update_selectable_pieces()
+move_generator = MoveGenerator(board)
+move_generator.update_selectable_pieces()
 
 
 def get_col_row(mouse_pos) -> tuple[int, int] |None:
@@ -94,6 +94,21 @@ def select_and_mark_squares_that_piece_can_move(clicked_piece: tuple[int, int] |
     return squares_that_piece_can_move
 
 
+""" Hamle yapıldığında bir sonraki geçişi yapıp tabloyu günceller """
+def load_next_state(piece_loc: tuple[int, int], picked_loc: tuple[int, int]):
+    move_nodes = board.moves[piece_loc]
+    for move in move_nodes:
+        if move.next_loc == picked_loc:
+            board.update_state(move.next_state)
+            if len(move.next_nodes) == 0:
+                print("zincir hamle değil")
+                move_generator.update_selectable_pieces()
+            else:
+                board.moves.clear()
+                board.moves[picked_loc] = move.next_nodes
+                print("zincir hame")
+
+
 def main():
     clock = pygame.time.Clock()
     selected_movable_piece: tuple[int, int] | None = None
@@ -110,8 +125,9 @@ def main():
                 if selected_movable_piece:
                     col_row = get_col_row(mouse_pos)
                     if col_row and col_row in squares_that_piece_can_move:
-                        # normal hamle yapabilen bir taş
-                        print("burada taş oynamalı")
+                        # hamle yapılıyor
+                        load_next_state(selected_movable_piece, col_row)
+                        # state_generator.update_selectable_pieces()
                 selected_movable_piece = get_moveable_piece(mouse_pos)
 
         # Arka planı tekrar çiz

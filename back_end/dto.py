@@ -35,18 +35,30 @@ class MoveNode:
 
 class Board:
 
-    def __init__(self):
-        self.state = np.array([
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-            [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
-            [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.O, SquareType.w, SquareType.w],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O],
-            [SquareType.O, SquareType.m, SquareType.O, SquareType.O, SquareType.O, SquareType.M, SquareType.O, SquareType.O],
-            [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
-            [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
-            [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
-        ], dtype=Enum)
-        # self.normal_move_map: Dict[tuple[int, int], List[tuple[int, int]]] = {}
+    def __init__(self, state=None):
+        if not state:
+            # self.state = np.array([
+            #     [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+            #     [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
+            #     [SquareType.w, SquareType.w, SquareType.O, SquareType.w, SquareType.w, SquareType.O, SquareType.w, SquareType.w],
+            #     [SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O],
+            #     [SquareType.O, SquareType.m, SquareType.m, SquareType.O, SquareType.O, SquareType.M, SquareType.O, SquareType.O],
+            #     [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
+            #     [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
+            #     [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+            # ], dtype=Enum)
+            self.state = np.array([
+                [SquareType.O, SquareType.W, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.w, SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O, SquareType.w, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.m, SquareType.O, SquareType.O, SquareType.m, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+            ], dtype=Enum)
+        else:
+            self.state = state
         self.moves: Dict[tuple[int, int], List[MoveNode]] = {}
 
     def update_state(self, state: np.ndarray):

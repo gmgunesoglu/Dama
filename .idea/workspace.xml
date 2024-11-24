@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Hamle yapabilecek taşların belirlenmesi ile ilgili fonksiyonlar yazıldı">
+    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Kurallar ile ilgili kodların yazılmaya devam ediyor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/dto.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/dto.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/state_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/state_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back_end/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/main_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -217,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732204121136</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Kurallar ile ilgili kodların yazılmaya devam ediyor">
+      <option name="closed" value="true" />
+      <created>1732300227613</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1732300227613</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -245,6 +252,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Hamle yapabilecek taşların belirlenmesi ile ilgili fonksiyonlar yazıldı" />
-    <option name="LAST_COMMIT_MESSAGE" value="Hamle yapabilecek taşların belirlenmesi ile ilgili fonksiyonlar yazıldı" />
+    <MESSAGE value="Kurallar ile ilgili kodların yazılmaya devam ediyor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Kurallar ile ilgili kodların yazılmaya devam ediyor" />
   </component>
 </project>
