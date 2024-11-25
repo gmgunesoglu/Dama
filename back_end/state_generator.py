@@ -7,53 +7,102 @@
     state in simetrisi referans alınır.
 """
 
-from back_end.dto import Board, SquareType, MoveNode
-from typing import List, Dict, Tuple
+# from back_end.dto import Board, SquareType, MoveNode
+from typing import List, Dict
+from enum import Enum
 import numpy as np
 
 
-class MoveGenerator:
-    def __init__(self, board: Board):
-        self.board = board
+class SquareType(Enum):
+    """
+    1. bit taş olup olmadığını
+    2. bit taşın 1. oyuncuya ait olup olmadığını
+    3. bit taşın dama olup olmadığını gösterir
+    """
+    O = 0b00000000      # 0 -> taş yok
+    w = 0b00000001      # 1 -> taş var, 2. oyuncu(siyah), piyon
+    W = 0b00000101      # 5 -> taş var, 2. oyuncu(siyah), dama
+    m = 0b00000011      # 3 -> taş var, 1. oyuncu(beyaz), piyon
+    M = 0b00000111      # 7 -> tav var, 1. oyuncu(beyaz), dama
 
-    def update_selectable_pieces(self):
+
+# taşların tipleri...
+class PieceType(Enum):
+    w = 0b00000001
+    W = 0b00000101
+    m = 0b00000011
+    M = 0b00000111
+
+
+class MoveNode:
+    def __init__(self, next_state, init_loc: tuple[int, int], next_loc: tuple[int, int]):
+        self.next_state = next_state
+        self.init_loc = init_loc
+        self.next_loc = next_loc
+        self.next_nodes: List[MoveNode] = []
+
+
+class Board:
+
+    def __init__(self, state=None):
+        if not state:
+            self.state = np.array([
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
+                [SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w, SquareType.w],
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+                [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
+                [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
+                [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
+            ], dtype=Enum)
+        else:
+            self.state = state
+        self.moves: Dict[tuple[int, int], List[MoveNode]] = {}
+
+    def update_state(self, state: np.ndarray):
+        if state.shape != (8, 8):
+            raise ValueError("[-] State must be an 8x8 np.ndarray.")
+        self.state = state
+
+    def update_moves(self):
         moves: Dict[tuple[int, int]: List[MoveNode]]
 
         indexes_of_selectable_pieces = self.__select_stones_that_have_to_move()
         if len(indexes_of_selectable_pieces) == 0:
             indexes_of_selectable_pieces = self.__select_stones_that_can_move()
             if len(indexes_of_selectable_pieces) == 0:
-                print(self.board.state)
+                print(self.state)
                 raise ValueError(f"[-] player hasn't a move, this is an unexpected state!")
             else:
                 """ Normal hamle yapmak gerekiyor """
-                self.board.moves = self.__find_normal_moves(indexes_of_selectable_pieces)
+                self.moves = self.__find_normal_moves(indexes_of_selectable_pieces)
         else:
             """ Taş yemek gerekiyor"""
-            self.board.moves = self.__find_mandatory_moves(indexes_of_selectable_pieces)
+            self.moves = self.__find_mandatory_moves(indexes_of_selectable_pieces)
 
     """ Taş yeme zorunluluğu olan taşların konumlarını bulur """
     def __select_stones_that_have_to_move(self) -> List[tuple[int, int]]:
-        state = self.board.state
+        state = self.state
         indexes_of_selectable_pieces: List[tuple[int, int]] = []
         for y in range(8):
             for x in range(8):
                 if state[y][x] == SquareType.m:
-                    if (MoveGenerator.__can_kill_left(self.board.state, x, y)
-                            or MoveGenerator.__can_kill_up(self.board.state, x, y)
-                            or MoveGenerator.__can_kill_right(self.board.state, x, y)):
+                    if (Board.__can_kill_left(state, x, y)
+                            or Board.__can_kill_up(state, x, y)
+                            or Board.__can_kill_right(state, x, y)):
                         indexes_of_selectable_pieces.append((x, y))
                 elif state[y][x] == SquareType.M:
-                    if (self.__can_kill_left_long(self.board.state, x, y)
-                            or self.__can_kill_down_long(self.board.state, x, y)
-                            or self.__can_kill_right_long(self.board.state, x, y)
-                            or self.__can_kill_up_long(self.board.state, x, y)):
+                    if (self.__can_kill_left_long(state, x, y)
+                            or self.__can_kill_down_long(state, x, y)
+                            or self.__can_kill_right_long(state, x, y)
+                            or self.__can_kill_up_long(state, x, y)):
                         indexes_of_selectable_pieces.append((x, y))
         return indexes_of_selectable_pieces
 
     """ Hamle yapabilen taşların konumlarını bulur """
     def __select_stones_that_can_move(self) -> List[tuple[int, int]]:
-        state = self.board.state
+        state = self.state
         indexes_of_selectable_pieces: List[tuple[int, int]] = []
         for y in range(8):
             for x in range(8):
@@ -68,16 +117,16 @@ class MoveGenerator:
         moves: Dict[tuple[int, int], List[MoveNode]] = {}
         for x, y in stones_can_move:
             moves[(x, y)] = []
-            if self.board.state[y][x] == SquareType.m:
+            if self.state[y][x] == SquareType.m:
                 """ Normal taş hamleleri """
                 if self.__left_is_free(x, y):
-                    next_state = self.board.state.copy()
+                    next_state = self.state.copy()
                     next_state[y][x] = SquareType.O
                     next_state[y][x - 1] = SquareType.m
                     move = MoveNode(next_state, (x, y), (x - 1, y))
                     moves[(x, y)].append(move)
                 if self.__up_is_free(x, y):
-                    next_state = self.board.state.copy()
+                    next_state = self.state.copy()
                     next_state[y][x] = SquareType.O
                     if y == 1:
                         next_state[0][x] = SquareType.M
@@ -86,12 +135,12 @@ class MoveGenerator:
                     move = MoveNode(next_state, (x, y), (x, y - 1))
                     moves[(x, y)].append(move)
                 if self.__right_is_free(x, y):
-                    next_state = self.board.state.copy()
+                    next_state = self.state.copy()
                     next_state[y][x] = SquareType.O
                     next_state[y][x + 1] = SquareType.m
                     move = MoveNode(next_state, (x, y), (x + 1, y))
                     moves[(x, y)].append(move)
-            elif self.board.state[y][x] == SquareType.M:
+            elif self.state[y][x] == SquareType.M:
                 """ Dama hamleleri """
                 moves[(x, y)] = (self.__left_is_free_long(x, y)
                                  + self.__up_is_free_long(x, y)
@@ -105,7 +154,7 @@ class MoveGenerator:
         for x, y in stones_can_move:
             moves[(x, y)] = []
             # listeyi filtrele, en çok taş yenecek hamleler kalsın
-            if self.board.state[y][x] == SquareType.m:
+            if self.state[y][x] == SquareType.m:
                 """ Normal taş hamleleri """
                 """ 
                     bir taş, birden fazla taş yiyebilir ve bu farklı hamlelerle yapılabilir, bana lazım olan şey:
@@ -113,7 +162,7 @@ class MoveGenerator:
                     Haritalandırma: taşın hareket ettiği konumlar ve oluşan ara geçiş durumları
                     List[Sınıf->attack map/move etc...] 
                 """
-                new_moves, depth = MoveGenerator.__get_attack_moves(self.board.state, x, y)
+                new_moves, depth = Board.__get_attack_moves(self.state, x, y)
                 if depth == max_depth:
                     moves[(x, y)] = new_moves
                 elif depth > max_depth:
@@ -121,9 +170,9 @@ class MoveGenerator:
                     moves.clear()
                     moves[(x, y)] = new_moves
 
-            elif self.board.state[y][x] == SquareType.M:
+            elif self.state[y][x] == SquareType.M:
                 """ Dama hamleleri """
-                new_moves, depth = MoveGenerator.__get_attack_moves_long(self.board.state, x, y)
+                new_moves, depth = Board.__get_attack_moves_long(self.state, x, y)
                 if depth == max_depth:
                     moves[(x, y)] = new_moves
                 elif depth > max_depth:
@@ -137,13 +186,13 @@ class MoveGenerator:
     def __get_attack_moves(state: np.ndarray, x: int, y: int, depth = 0) -> (List[MoveNode], int):
         moves: List[MoveNode] = []
         max_depth = depth
-        if MoveGenerator.__can_kill_left(state, x, y):
+        if Board.__can_kill_left(state, x, y):
             next_state = state.copy()
             next_state[y][x] = SquareType.O
             next_state[y][x - 1] = SquareType.O
             next_state[y][x - 2] = SquareType.m
             node = MoveNode(next_state, (x, y), (x - 2, y))
-            node.next_nodes, current_depth = MoveGenerator.__get_attack_moves(next_state, x - 2, y, depth + 1)
+            node.next_nodes, current_depth = Board.__get_attack_moves(next_state, x - 2, y, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
             elif current_depth > max_depth:
@@ -151,7 +200,7 @@ class MoveGenerator:
                 moves.clear()
                 moves.append(node)
 
-        if MoveGenerator.__can_kill_up(state, x, y):
+        if Board.__can_kill_up(state, x, y):
             next_state = state.copy()
             next_state[y][x] = SquareType.O
             next_state[y - 1][x] = SquareType.O
@@ -163,7 +212,7 @@ class MoveGenerator:
                 return moves, depth + 1
             next_state[y - 2][x] = SquareType.m
             node = MoveNode(next_state, (x, y), (x, y - 2))
-            node.next_nodes, current_depth = MoveGenerator.__get_attack_moves(next_state, x, y - 2, depth + 1)
+            node.next_nodes, current_depth = Board.__get_attack_moves(next_state, x, y - 2, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
             elif current_depth > max_depth:
@@ -171,13 +220,13 @@ class MoveGenerator:
                 moves.clear()
                 moves.append(node)
 
-        if MoveGenerator.__can_kill_right(state, x, y):
+        if Board.__can_kill_right(state, x, y):
             next_state = state.copy()
             next_state[y][x] = SquareType.O
             next_state[y][x + 1] = SquareType.O
             next_state[y][x + 2] = SquareType.m
             node = MoveNode(next_state, (x, y), (x + 2, y))
-            node.next_nodes, current_depth = MoveGenerator.__get_attack_moves(next_state, x + 2, y, depth + 1)
+            node.next_nodes, current_depth = Board.__get_attack_moves(next_state, x + 2, y, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
             elif current_depth > max_depth:
@@ -193,7 +242,7 @@ class MoveGenerator:
         max_depth = depth
 
         """ sola dorğu taş yeme hamelleri """
-        enemy_loc = MoveGenerator.__can_kill_left_long(state, x, y)
+        enemy_loc = Board.__can_kill_left_long(state, x, y)
         if enemy_loc:
             next_x, next_y = enemy_loc
             while next_x > 0:
@@ -205,7 +254,7 @@ class MoveGenerator:
                 next_state[enemy_loc[1]][enemy_loc[0]] = SquareType.O
                 next_state[next_y][next_x] = SquareType.M
                 node = MoveNode(next_state, (x, y), (next_x, next_y))
-                node.next_nodes, current_depth = MoveGenerator.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
+                node.next_nodes, current_depth = Board.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
                 elif current_depth > max_depth:
@@ -214,7 +263,7 @@ class MoveGenerator:
                     moves.append(node)
 
         """ yukarı doğru taş yeme hamleleri """
-        enemy_loc = MoveGenerator.__can_kill_up_long(state, x, y)
+        enemy_loc = Board.__can_kill_up_long(state, x, y)
         if enemy_loc:
             next_x, next_y = enemy_loc
             while next_y > 0:
@@ -226,7 +275,7 @@ class MoveGenerator:
                 next_state[enemy_loc[1]][enemy_loc[0]] = SquareType.O
                 next_state[next_y][next_x] = SquareType.M
                 node = MoveNode(next_state, (x, y), (next_x, next_y))
-                node.next_nodes, current_depth = MoveGenerator.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
+                node.next_nodes, current_depth = Board.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
                 elif current_depth > max_depth:
@@ -235,7 +284,7 @@ class MoveGenerator:
                     moves.append(node)
 
         """ Sağa doğru taş yeme hamleleri """
-        enemy_loc = MoveGenerator.__can_kill_right_long(state, x, y)
+        enemy_loc = Board.__can_kill_right_long(state, x, y)
         if enemy_loc:
             next_x, next_y = enemy_loc
             while next_x < 7:
@@ -247,7 +296,7 @@ class MoveGenerator:
                 next_state[enemy_loc[1]][enemy_loc[0]] = SquareType.O
                 next_state[next_y][next_x] = SquareType.M
                 node = MoveNode(next_state, (x, y), (next_x, next_y))
-                node.next_nodes, current_depth = MoveGenerator.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
+                node.next_nodes, current_depth = Board.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
                 elif current_depth > max_depth:
@@ -256,7 +305,7 @@ class MoveGenerator:
                     moves.append(node)
 
         """ Aşağı doğru taş yeme hamleleri """
-        enemy_loc = MoveGenerator.__can_kill_down_long(state, x, y)
+        enemy_loc = Board.__can_kill_down_long(state, x, y)
         if enemy_loc:
             next_x, next_y = enemy_loc
             while next_y < 7:
@@ -268,7 +317,7 @@ class MoveGenerator:
                 next_state[enemy_loc[1]][enemy_loc[0]] = SquareType.O
                 next_state[next_y][next_x] = SquareType.M
                 node = MoveNode(next_state, (x, y), (next_x, next_y))
-                node.next_nodes, current_depth = MoveGenerator.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
+                node.next_nodes, current_depth = Board.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
                 elif current_depth > max_depth:
@@ -279,22 +328,22 @@ class MoveGenerator:
         return moves, max_depth
 
     def __left_is_free(self, x: int, y: int) -> bool:
-        if x >= 1 and self.board.state[y][x - 1] == SquareType.O:
+        if x >= 1 and self.state[y][x - 1] == SquareType.O:
             return True
         return False
 
     def __up_is_free(self, x: int, y: int) -> bool:
-        if y >= 1 and self.board.state[y - 1][x] == SquareType.O:
+        if y >= 1 and self.state[y - 1][x] == SquareType.O:
             return True
         return False
 
     def __right_is_free(self, x: int, y: int) -> bool:
-        if x <= 6 and self.board.state[y][x + 1] == SquareType.O:
+        if x <= 6 and self.state[y][x + 1] == SquareType.O:
             return True
         return False
 
     def __down_is_free(self, x: int, y: int) -> bool:
-        if y <= 6 and self.board.state[y + 1][x] == SquareType.O:
+        if y <= 6 and self.state[y + 1][x] == SquareType.O:
             return True
         return False
 
@@ -302,7 +351,7 @@ class MoveGenerator:
         moves: List[MoveNode] = []
         final_x = x
         while self.__left_is_free(x, y):
-            next_state = self.board.state.copy()
+            next_state = self.state.copy()
             next_state[y][final_x] = SquareType.O
             x -= 1
             next_state[y][x] = SquareType.M
@@ -313,7 +362,7 @@ class MoveGenerator:
         moves: List[MoveNode] = []
         final_y = y
         while self.__up_is_free(x, y):
-            next_state = self.board.state.copy()
+            next_state = self.state.copy()
             next_state[final_y][x] = SquareType.O
             y -= 1
             next_state[y][x] = SquareType.M
@@ -324,7 +373,7 @@ class MoveGenerator:
         moves: List[MoveNode] = []
         final_x = x
         while self.__right_is_free(x, y):
-            next_state = self.board.state.copy()
+            next_state = self.state.copy()
             next_state[y][final_x] = SquareType.O
             x += 1
             next_state[y][x] = SquareType.M
@@ -335,7 +384,7 @@ class MoveGenerator:
         moves: List[MoveNode] = []
         final_y = y
         while self.__down_is_free(x, y):
-            next_state = self.board.state.copy()
+            next_state = self.state.copy()
             next_state[final_y][x] = SquareType.O
             y += 1
             next_state[y][x] = SquareType.M
@@ -372,7 +421,7 @@ class MoveGenerator:
                 return x - 1, y
             if state[y][x - 1] == SquareType.O:
                 """ Solda taş yoksa bir soldan tekrar aynı süreç başlar """
-                return MoveGenerator.__can_kill_left_long(state, x - 1, y)
+                return Board.__can_kill_left_long(state, x - 1, y)
 
     @staticmethod
     def __can_kill_up_long(state, x: int, y: int) -> tuple[int, int] | None:
@@ -382,7 +431,7 @@ class MoveGenerator:
                 return x, y - 1
             if state[y - 1][x] == SquareType.O:
                 """ Aşağıda taş yoksa bir aşağıdan tekrar aynı süreç başlar """
-                return MoveGenerator.__can_kill_up_long(state, x, y - 1)
+                return Board.__can_kill_up_long(state, x, y - 1)
 
     @staticmethod
     def __can_kill_right_long(state, x: int, y: int) -> tuple[int, int] | None:
@@ -392,7 +441,7 @@ class MoveGenerator:
                 return x + 1, y
             if state[y][x + 1] == SquareType.O:
                 """ Sağda taş yoksa bir sağdan tekrar aynı süreç başlar """
-                return MoveGenerator.__can_kill_right_long(state, x + 1, y)
+                return Board.__can_kill_right_long(state, x + 1, y)
 
     @staticmethod
     def __can_kill_down_long(state, x: int, y: int) -> tuple[int, int] | None:
@@ -402,6 +451,5 @@ class MoveGenerator:
                 return x, y + 1
             if state[y + 1][x] == SquareType.O:
                 """ Yukarıda taş yoksa bir yukarıdan tekrar aynı süreç başlar """
-                return MoveGenerator.__can_kill_down_long(state, x, y + 1)
-
+                return Board.__can_kill_down_long(state, x, y + 1)
 

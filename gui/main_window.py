@@ -2,8 +2,8 @@ import pygame
 import sys
 from enum import Enum
 import numpy as np
-from back_end.dto import SquareType, PieceType, Board, MoveNode
-from back_end.state_generator import MoveGenerator
+# from back_end.dto import
+from back_end.state_generator import SquareType, PieceType, Board, MoveNode
 from typing import List
 
 
@@ -34,8 +34,7 @@ PIECE_IMAGE_MAP = {
 
 
 board = Board()
-move_generator = MoveGenerator(board)
-move_generator.update_selectable_pieces()
+board.update_moves()
 
 
 def get_col_row(mouse_pos) -> tuple[int, int] |None:
@@ -102,7 +101,7 @@ def load_next_state(piece_loc: tuple[int, int], picked_loc: tuple[int, int]):
             board.update_state(move.next_state)
             if len(move.next_nodes) == 0:
                 print("zincir hamle değil")
-                move_generator.update_selectable_pieces()
+                board.update_moves()
             else:
                 board.moves.clear()
                 board.moves[picked_loc] = move.next_nodes

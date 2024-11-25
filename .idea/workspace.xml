@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Kurallar ile ilgili kodların yazılmaya devam ediyor">
+    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Kurallar ile ilgili kodlar yazıldı.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/dto.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/dto.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/state_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/state_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/main_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,27 +52,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Python.dto.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.main_window.executor": "Run",
-    "Python.state_generator.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.test_gui.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/Gokhan/Projects/Python/YapayZeka/proje"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Python.dto.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_window.executor&quot;: &quot;Run&quot;,
+    &quot;Python.state_generator.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_gui.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Gokhan/Projects/Python/YapayZeka/proje&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Gokhan\Projects\Python\Dama" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main_window">
+  <component name="RunManager" selected="Python.test">
     <configuration name="dto" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Dama" />
       <option name="ENV_FILES" value="" />
@@ -184,9 +185,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.main_window" />
         <item itemvalue="Python.state_generator" />
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.dto" />
         <item itemvalue="Python.test_gui" />
       </list>
@@ -224,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732300227613</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Kurallar ile ilgili kodlar yazıldı.">
+      <option name="closed" value="true" />
+      <created>1732459594540</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1732459594540</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -253,6 +262,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Hamle yapabilecek taşların belirlenmesi ile ilgili fonksiyonlar yazıldı" />
     <MESSAGE value="Kurallar ile ilgili kodların yazılmaya devam ediyor" />
-    <option name="LAST_COMMIT_MESSAGE" value="Kurallar ile ilgili kodların yazılmaya devam ediyor" />
+    <MESSAGE value="Kurallar ile ilgili kodlar yazıldı." />
+    <option name="LAST_COMMIT_MESSAGE" value="Kurallar ile ilgili kodlar yazıldı." />
   </component>
 </project>
