@@ -42,6 +42,51 @@ class MoveNode:
         self.next_nodes: List[MoveNode] = []
 
 
+SCORE_DICT = {
+    SquareType.O.value: np.zeros((8, 8), dtype=int),
+    SquareType.w.value: np.array([
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [-15, -10, -10, -10, -10, -10, -10, -15],
+        [-18, -12, -12, -12, -12, -12, -12, -18],
+        [-21, -14, -14, -14, -14, -14, -14, -21],
+        [-24, -16, -16, -16, -16, -16, -16, -24],
+        [-27, -18, -18, -18, -18, -18, -18, -27],
+        [-30, -20, -20, -20, -20, -20, -20, -30],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+    ], dtype=int),
+    SquareType.W.value: np.array([
+        [-64, -48, -48, -48, -48, -48, -48, -64],
+        [-48, -32, -32, -32, -32, -32, -32, -48],
+        [-48, -32, -32, -32, -32, -32, -32, -48],
+        [-48, -32, -32, -32, -32, -32, -32, -48],
+        [-48, -32, -32, -32, -32, -32, -32, -48],
+        [-48, -32, -32, -32, -32, -32, -32, -48],
+        [-48, -32, -32, -32, -32, -32, -32, -48],
+        [-64, -48, -48, -48, -48, -48, -48, -64],
+    ], dtype=int),
+    SquareType.m.value: np.array([
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [30, 20, 20, 20, 20, 20, 20, 30],
+        [27, 18, 18, 18, 18, 18, 18, 27],
+        [24, 16, 16, 16, 16, 16, 16, 24],
+        [21, 14, 14, 14, 14, 14, 14, 21],
+        [18, 12, 12, 12, 12, 12, 12, 18],
+        [15, 10, 10, 10, 10, 10, 10, 15],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+    ], dtype=int),
+    SquareType.M.value: np.array([
+        [64, 48, 48, 48, 48, 48, 48, 64],
+        [48, 32, 32, 32, 32, 32, 32, 48],
+        [48, 32, 32, 32, 32, 32, 32, 48],
+        [48, 32, 32, 32, 32, 32, 32, 48],
+        [48, 32, 32, 32, 32, 32, 32, 48],
+        [48, 32, 32, 32, 32, 32, 32, 48],
+        [48, 32, 32, 32, 32, 32, 32, 48],
+        [64, 48, 48, 48, 48, 48, 48, 64],
+    ], dtype=int),
+}
+
+
 class Board:
 
     def __init__(self, state=None):
@@ -56,6 +101,16 @@ class Board:
                 [SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m, SquareType.m],
                 [SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O, SquareType.O],
             ], dtype=Enum)
+            # self.state = np.array([
+            #     [SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value],
+            #     [SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value],
+            #     [SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value, SquareType.w.value],
+            #     [SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value],
+            #     [SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value],
+            #     [SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value],
+            #     [SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value, SquareType.m.value],
+            #     [SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value, SquareType.O.value],
+            # ], dtype=int)
         else:
             self.state = state
         self.moves: Dict[tuple[int, int], List[MoveNode]] = {}
@@ -452,4 +507,48 @@ class Board:
             if state[y + 1][x] == SquareType.O:
                 """ Yukarıda taş yoksa bir yukarıdan tekrar aynı süreç başlar """
                 return Board.__can_kill_down_long(state, x, y + 1)
+
+    def reverse_state(self):
+        self.state = np.flip(self.state)
+
+
+""" Board dan hamleleri al, durumları türet, hamleleri puanla, """
+class StateManager:
+
+    @staticmethod
+    def get_final_states(board: Board) -> List[tuple[int, np.ndarray]]:
+        final_states = []
+        for root_nodes in board.moves.values():
+            for root_node in root_nodes:
+                final_states += StateManager.__get_last_states(root_node)
+        """ Stateleri puanlandır """
+        final_states: List[tuple[int, np.ndarray]] = StateManager.__calculate_scores_of_states(final_states)
+        final_states = sorted(final_states, key=lambda x: x[0])
+        return final_states
+
+    @staticmethod
+    def __get_last_states(move: MoveNode):
+        state_list = []
+        if len(move.next_nodes) == 0:
+            state_list.append(move.next_state)
+            return state_list
+        for node in move.next_nodes:
+            state_list += StateManager.__get_last_states(node)
+        return state_list
+
+    @staticmethod
+    def __calculate_scores_of_states(final_states: List[np.ndarray]) -> List[tuple[int, np.ndarray]]:
+        result: List[tuple[int, np.ndarray]] = []
+        convert_to_int = np.vectorize(lambda x: x.value)
+        for final_state in final_states:
+            final_state_int = convert_to_int(final_state)
+            score_state = np.zeros((8, 8), dtype=int)
+            for y in range(8):
+                for x in range(8):
+                    score_state[y][x] = SCORE_DICT[final_state_int[y][x]][y][x]
+            result.append((score_state.sum(), final_state))
+        return result
+
+
+
 

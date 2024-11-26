@@ -3,7 +3,7 @@ import sys
 from enum import Enum
 import numpy as np
 # from back_end.dto import
-from back_end.state_generator import SquareType, PieceType, Board, MoveNode
+from back_end.service import SquareType, PieceType, Board, StateManager
 from typing import List
 
 
@@ -101,6 +101,7 @@ def load_next_state(piece_loc: tuple[int, int], picked_loc: tuple[int, int]):
             board.update_state(move.next_state)
             if len(move.next_nodes) == 0:
                 print("zincir hamle değil")
+                compter_moves = StateManager.get_final_states(board)
                 board.update_moves()
             else:
                 board.moves.clear()

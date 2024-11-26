@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Kurallar ile ilgili kodlar yazıldı.">
+    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Kod temizlemesi: dto modülü kaldırıldı, Move/State generatörde yapılan işler(state için yapılabilecek hamleleri bulma) Board sınıfına aktarıldı">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back_end/dto.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/dto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back_end/state_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/state_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/state_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/main_window.py" afterDir="false" />
     </list>
@@ -64,7 +63,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Gokhan/Projects/Python/YapayZeka/proje&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Gokhan/Projects/Python/TraderAI&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -72,7 +71,7 @@
       <recent name="C:\Users\Gokhan\Projects\Python\Dama" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.main_window">
     <configuration name="dto" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Dama" />
       <option name="ENV_FILES" value="" />
@@ -117,7 +116,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="state_generator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="service" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Dama" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -130,7 +129,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/back_end/state_generator.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\Gokhan\Projects\Python\Dama\back_end\service.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -185,9 +184,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.main_window" />
-        <item itemvalue="Python.state_generator" />
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.service" />
         <item itemvalue="Python.dto" />
         <item itemvalue="Python.test_gui" />
       </list>
@@ -233,7 +232,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732459594540</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Kod temizlemesi: dto modülü kaldırıldı, Move/State generatörde yapılan işler(state için yapılabilecek hamleleri bulma) Board sınıfına aktarıldı">
+      <option name="closed" value="true" />
+      <created>1732510750504</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1732510750504</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -263,6 +270,7 @@
     <MESSAGE value="Hamle yapabilecek taşların belirlenmesi ile ilgili fonksiyonlar yazıldı" />
     <MESSAGE value="Kurallar ile ilgili kodların yazılmaya devam ediyor" />
     <MESSAGE value="Kurallar ile ilgili kodlar yazıldı." />
-    <option name="LAST_COMMIT_MESSAGE" value="Kurallar ile ilgili kodlar yazıldı." />
+    <MESSAGE value="Kod temizlemesi: dto modülü kaldırıldı, Move/State generatörde yapılan işler(state için yapılabilecek hamleleri bulma) Board sınıfına aktarıldı" />
+    <option name="LAST_COMMIT_MESSAGE" value="Kod temizlemesi: dto modülü kaldırıldı, Move/State generatörde yapılan işler(state için yapılabilecek hamleleri bulma) Board sınıfına aktarıldı" />
   </component>
 </project>
