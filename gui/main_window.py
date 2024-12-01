@@ -3,7 +3,7 @@ import sys
 from enum import Enum
 import numpy as np
 # from back_end.dto import
-from back_end.service import SquareType, PieceType, Board, StateManager
+from back_end.service import PieceType, Board, StateManager, SCORE_DICT
 from typing import List
 
 
@@ -26,15 +26,26 @@ screen.blit(background, (0, 0))
 # arka planın üzerine taşlar daire olarak çiziliyor,
 # bu içlemi hızlandırmak için hashmap...
 PIECE_IMAGE_MAP = {
-    PieceType.m: pygame.transform.scale(pygame.image.load("source/m.png").convert_alpha(), (80, 80)),
-    PieceType.M: pygame.transform.scale(pygame.image.load("source/mm.png").convert_alpha(), (80, 80)),
-    PieceType.w: pygame.transform.scale(pygame.image.load("source/w.png").convert_alpha(), (80, 80)),
-    PieceType.W: pygame.transform.scale(pygame.image.load("source/ww.png").convert_alpha(), (80, 80))
+    5: pygame.transform.scale(pygame.image.load("source/m.png").convert_alpha(), (80, 80)),
+    4: pygame.transform.scale(pygame.image.load("source/mm.png").convert_alpha(), (80, 80)),
+    1: pygame.transform.scale(pygame.image.load("source/w.png").convert_alpha(), (80, 80)),
+    2: pygame.transform.scale(pygame.image.load("source/ww.png").convert_alpha(), (80, 80))
 }
 
-
+# state =  np.array([
+#                 [3, 3, 3, 3, 3, 3, 3, 3],
+#                 [3, 1, 3, 3, 3, 3, 3, 3],
+#                 [3, 3, 4, 3, 3, 3, 3, 3],
+#                 [3, 3, 3, 3, 1, 3, 3, 3],
+#                 [3, 3, 3, 3, 1, 3, 3, 3],
+#                 [3, 3, 3, 3, 5, 3, 3, 3],
+#                 [3, 3, 3, 3, 3, 3, 3, 3],
+#                 [3, 3, 3, 3, 3, 3, 3, 3],
+#             ], dtype=int)
+# board = Board(state)
 board = Board()
 board.update_moves()
+state_manager = StateManager(board, 4)
 
 
 def get_col_row(mouse_pos) -> tuple[int, int] |None:
@@ -57,7 +68,8 @@ def get_moveable_piece(mouse_pos) -> tuple[int, int] | None:
         return
 
     col, row = pos
-    if board.state[row][col].value & SquareType.m.value != SquareType.m.value:
+    # TODO optimizasyon gerekli
+    if board.state[row][col] <= 3:
         return
     center_x = col * 100 + 100
     center_y = row * 100 + 100
@@ -70,8 +82,9 @@ def get_moveable_piece(mouse_pos) -> tuple[int, int] | None:
 def drive_pieces():
     for y in range(8):
         for x in range(8):
-            if board.state[y][x] != SquareType.O:
-                image = PIECE_IMAGE_MAP[PieceType((PieceType[SquareType(board.state[y][x]).name]))]
+            if board.state[y][x] != 3:
+                image = PIECE_IMAGE_MAP[board.state[y][x]]
+                # TODO optimizasyon gerekli
                 screen.blit(image, (x * 100 + 60, y * 100 + 60))
 
 
@@ -101,8 +114,20 @@ def load_next_state(piece_loc: tuple[int, int], picked_loc: tuple[int, int]):
             board.update_state(move.next_state)
             if len(move.next_nodes) == 0:
                 print("zincir hamle değil")
-                compter_moves = StateManager.get_final_states(board)
-                board.update_moves()
+                next_states = state_manager.get_ai_moves()
+                for next_state in next_states:
+                    print(f"Score: {next_state.value}\n{next_state.state}\n")
+                    score_arr = np.where(next_state.state == 1, SCORE_DICT[1], np.where(
+                        next_state.state == 5, SCORE_DICT[5], np.where(
+                            next_state.state == 2, SCORE_DICT[2], np.where(
+                                next_state.state == 4, SCORE_DICT[4], 0
+                            )
+                        )
+                    ))
+                    print(f"recalculated Score: {score_arr.sum()}")
+                    board.update_state(next_states[0].state)
+                    board.update_moves()
+                    break
             else:
                 board.moves.clear()
                 board.moves[picked_loc] = move.next_nodes
