@@ -5,7 +5,7 @@ import sys
 from enum import Enum
 import numpy as np
 # from back_end.dto import
-from back_end.service import Board, StateManager, SCORE_DICT
+from back_end.service import Board, StateManager, MoveNode
 from typing import List
 
 
@@ -64,6 +64,7 @@ state =  np.array([
 board = Board(state, True)
 board.update_moves()
 state_manager = StateManager(board, game_level, user_is_first_player)
+mark_of_ai_move: List[tuple[int, int]] = []
 
 
 def get_col_row(mouse_pos) -> tuple[int, int] |None:
@@ -143,9 +144,38 @@ def effect_user_move(piece_loc: tuple[int, int], picked_loc: tuple[int, int]):
 def ai_move():
     next_states = state_manager.get_ai_moves()
     for next_state in next_states:
+        update_mark_of_ai_move(next_states[0].state)
         board.load_next_state(next_states[0].state)
         board.update_moves()
         break
+
+def update_mark_of_ai_move(next_state: np.ndarray):
+    for root_nodes in board.moves.values():
+        for root_node in root_nodes:
+            if get_trace_of_move(root_node, next_state):
+                mark_of_ai_move.append(root_node.init_loc)
+                print(f"trace: {mark_of_ai_move}")
+
+
+def mark_ai_move():
+    for x, y in mark_of_ai_move:
+        color = (0, 0, 255, 50)  # Saydam yeşil (RGBA)
+        # Saydam yüzey oluştur
+        overlay_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_WIDTH), pygame.SRCALPHA)
+        # Saydam yüzey üzerine kare çiz
+        pygame.draw.rect(overlay_surface, color, (x * 100 + 50, y * 100 + 50, 100, 100))
+        # Ana yüzeyin üzerine saydam yüzeyi yerleştir
+        screen.blit(overlay_surface, (0, 0))
+
+
+def get_trace_of_move(move_node: MoveNode, target_state: np.ndarray):
+    if np.array_equal(move_node.next_state, target_state):
+        return True
+    for next_node in move_node.next_nodes:
+        if get_trace_of_move(next_node, target_state):
+            mark_of_ai_move.append(next_node.init_loc)
+            return True
+    return False
 
 
 def main():
@@ -170,6 +200,7 @@ def main():
                     col_row = get_col_row(mouse_pos)
                     if col_row and col_row in squares_that_piece_can_move:
                         # hamle yapılıyor
+                        mark_of_ai_move.clear()
                         user_turn = effect_user_move(selected_movable_piece, col_row)
                         # Arka planı tekrar çiz
                         screen.blit(background, (0, 0))
@@ -187,6 +218,8 @@ def main():
         drive_pieces()
         # oynanabilir bir taş seçilmişse oynayabileceği kareleri yeşil belirt ve oynanabilir karelerin konumları döndür
         squares_that_piece_can_move = select_and_mark_squares_that_piece_can_move(selected_movable_piece)
+        # karşı taraf hamlesini yaptıysa çiz
+        mark_ai_move()
 
         # Ekranı güncelle
         pygame.display.update()
