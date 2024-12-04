@@ -246,6 +246,7 @@ def menu():
                 elif button_4_rect.collidepoint(event.pos):
                     # TODO yapay zekanın kendi kendine oynaması simüle edilecek
                     print("Bu fonksiyon geliştirme aşamasında")
+                    print("Bu fonksiyon geliştirme aşamasında")
 
         pygame.display.update()
 
