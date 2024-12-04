@@ -580,7 +580,6 @@ class StateManager:
 
         next_state_nodes: List[StateNode] = []
         final_states: List[np.ndarray] = []
-        # board = Board(StateManager.reverse_state(root_state.state))
         board = Board(root_state.state, turn_on_first_player)
         try:
             board.update_moves()
@@ -608,21 +607,6 @@ class StateManager:
         for next_node in move_node.next_nodes:
             final_states += StateManager.__get_final_states(next_node)
         return final_states
-
-    # @staticmethod
-    # def __calculate_scores_of_states(final_states: List[np.ndarray]) -> List[tuple[int, np.ndarray]]:
-    #     result: List[tuple[int, np.ndarray]] = []
-    #
-    #     for final_state in final_states:
-    #         score_arr = np.where(final_state == 1, SCORE_DICT[1], np.where(
-    #             final_state == 5, SCORE_DICT[5], np.where(
-    #                 final_state == 2, SCORE_DICT[2], np.where(
-    #                     final_state == 4, SCORE_DICT[4], 0
-    #                 )
-    #             )
-    #         ))
-    #         result.append((score_arr.sum(), StateManager.reverse_state(final_state)))
-    #     return result
 
     @staticmethod
     def reverse_state(state):
