@@ -530,6 +530,10 @@ class StateManager:
         self.board = board
         self.game_level = game_level
         self.turn_on_user = not user_is_first_player
+        if user_is_first_player:
+            self.ai_goes_mim = game_level % 2 == 0
+        else:
+            self.ai_goes_mim = game_level % 2 == 1
 
     # TODO board üzerinden değil state ve hamleler üzerinden çalışmalı
     def get_ai_moves(self) -> List[StateNode]:
@@ -567,7 +571,7 @@ class StateManager:
 
         """ Sırala """
         first_layer = state_dict[1]
-        first_layer = sorted(first_layer, key=lambda node: node.value, reverse=not self.turn_on_user)
+        first_layer = sorted(first_layer, key=lambda node: node.value, reverse=self.ai_goes_mim)
         return first_layer
 
     def __get_states_of_next_layer(self, root_state: StateNode, layer: int) -> List[StateNode]:

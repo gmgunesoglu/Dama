@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Karşı tarafın hamlesinin izi takip edilebilir hale getirildi">
+    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Menü eklendi. Oyunun zorluk seviyesi ile ilgili problem düzeltilecek">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/main_window.py" afterDir="false" />
@@ -264,7 +264,23 @@
       <option name="project" value="LOCAL" />
       <updated>1733296143146</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Karşı tarafın hamlesinin izi takip edilebilir hale getirildi">
+      <option name="closed" value="true" />
+      <created>1733327420625</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1733327420625</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Menü eklendi. Oyunun zorluk seviyesi ile ilgili problem düzeltilecek">
+      <option name="closed" value="true" />
+      <created>1733327556757</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1733327556757</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -298,7 +314,9 @@
     <MESSAGE value="State enum dan int dizisine çevrilecek" />
     <MESSAGE value="Optimizasyon düzeltmeleri yapıldı. Bilgisayar hamle yapabiliyor." />
     <MESSAGE value="birinci/ikinci oyuncu olarak oynama dinamikleştirildi. Türetilen durumların hamleleri hesaplanırken durumun simetrisini kullanma yaklaşımı iptal edildi." />
+    <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;gui/main_window.py" />
     <MESSAGE value="Karşı tarafın hamlesinin izi takip edilebilir hale getirildi" />
-    <option name="LAST_COMMIT_MESSAGE" value="Karşı tarafın hamlesinin izi takip edilebilir hale getirildi" />
+    <MESSAGE value="Menü eklendi. Oyunun zorluk seviyesi ile ilgili problem düzeltilecek" />
+    <option name="LAST_COMMIT_MESSAGE" value="Menü eklendi. Oyunun zorluk seviyesi ile ilgili problem düzeltilecek" />
   </component>
 </project>
