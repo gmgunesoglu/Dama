@@ -23,10 +23,11 @@ class MoveNode:
 
 
 class StateNode:
-    def __init__(self, value: int, state: np.ndarray, father: StateNode | None = None):
+    def __init__(self, value: int, state: np.ndarray, father: StateNode | None = None, is_leaf: bool = False):
         self.value = value
         self.state = state
         self.father = father
+        self.is_leaf = is_leaf
 
 
 SCORE_DICT = {
@@ -526,14 +527,10 @@ class Board:
 """ Board dan hamleleri al, durumları türet, hamleleri puanla, """
 class StateManager:
 
-    def __init__(self, board: Board, game_level: int, user_is_first_player):
-        self.board = board
-        self.game_level = game_level
-        self.turn_on_user = not user_is_first_player
-        if user_is_first_player:
-            self.ai_goes_mim = game_level % 2 == 0
-        else:
-            self.ai_goes_mim = game_level % 2 == 1
+    def __init__(self, board: Board, game_level: int, user_is_first_player: bool):
+        self.board: Board = board
+        self.game_level: int = game_level
+        self.ai_goes_max: bool = not user_is_first_player
 
     # TODO board üzerinden değil state ve hamleler üzerinden çalışmalı
     def get_ai_moves(self) -> List[StateNode]:
@@ -549,49 +546,48 @@ class StateManager:
             for root_state in state_dict[lvl]:
                 state_dict[lvl + 1] += self.__get_states_of_next_layer(root_state, lvl + 1)
 
-        """ Puanlandır """
-        sign = 1
-        if self.game_level % 2 == 0:
-            sign = -1
+        """ En dipteki durum düğümlerinin değerlerini hesapla """
         for state_node in state_dict[self.game_level]:
-            score_matrix = np.where(state_node.state == 1, SCORE_DICT[1], np.where(
-                state_node.state == 5, SCORE_DICT[5], np.where(
-                    state_node.state == 2, SCORE_DICT[2], np.where(
-                        state_node.state == 4, SCORE_DICT[4], 0
+            if not StateManager.__check_if_final_state_and_update_value(state_node):
+                score_matrix = np.where(state_node.state == 1, SCORE_DICT[1], np.where(
+                    state_node.state == 5, SCORE_DICT[5], np.where(
+                        state_node.state == 2, SCORE_DICT[2], np.where(
+                            state_node.state == 4, SCORE_DICT[4], 0
+                        )
                     )
-                )
-            ))
-            state_node.value = score_matrix.sum() * sign
+                ))
+                state_node.value = score_matrix.sum()
+
+        """ Hesaplanan değerleri dipten yukarıya doğru taşı """
         for layer in range(self.game_level, 0, -1):
             for state_node in state_dict[layer]:
-                # state_node.state = StateManager.reverse_state(state_node.state)
-                if ((layer % 2 == 0 and state_node.father.value < state_node.value)
-                        or (layer % 2 == 1 and state_node.father.value > state_node.value)):
+                layer_goes_max = self.ai_goes_max == (layer % 2 == 1)
+                if ((layer_goes_max and state_node.father.value < state_node.value)
+                        or (not layer_goes_max and state_node.father.value > state_node.value)):
                     state_node.father.value = state_node.value
 
         """ Sırala """
         first_layer = state_dict[1]
-        first_layer = sorted(first_layer, key=lambda node: node.value, reverse=self.ai_goes_mim)
+        first_layer = sorted(first_layer, key=lambda node: node.value, reverse=self.ai_goes_max)
         return first_layer
 
     def __get_states_of_next_layer(self, root_state: StateNode, layer: int) -> List[StateNode]:
-        turn_on_first_player = self.turn_on_user
-        if layer % 2 == 0:
-            root_state.value = -2500
-            turn_on_first_player = not turn_on_first_player
-        else:
-            root_state.value = 2500
-
         next_state_nodes: List[StateNode] = []
+        if StateManager.__check_if_final_state_and_update_value(root_state):
+            return next_state_nodes
+
+        goes_max = self.ai_goes_max == (layer % 2 == 1)
+        if goes_max:
+            root_state.value = -5000
+        else:
+            root_state.value = 5000
+
         final_states: List[np.ndarray] = []
-        board = Board(root_state.state, turn_on_first_player)
+        board = Board(root_state.state, goes_max)
         try:
             board.update_moves()
         except ValueError:
-            if layer % 2 == 1:
-                root_state.value = -10000
-            else:
-                root_state.value = 10000
+            print("Bu artık olmaması gereken bir durum!")
 
         for root_move_nodes in board.moves.values():
             for root_move_node in root_move_nodes:
@@ -601,6 +597,27 @@ class StateManager:
             next_state_nodes.append(StateNode(0, final_state, root_state))
 
         return next_state_nodes
+
+    @staticmethod
+    def __check_if_final_state_and_update_value(state_node: StateNode) -> bool:
+        # beyazın yenmesi
+        w_count = np.sum((state_node.state == 1) | (state_node.state == 2))
+        if w_count == 0:
+            state_node.value = 10000
+            state_node.is_leaf = True
+            return True
+        # siyahın yenmesi
+        m_count = np.sum((state_node.state == 5) | (state_node.state == 4))
+        if m_count == 0:
+            state_node.value = -10000
+            state_node.is_leaf = True
+            return True
+        # beraberlik
+        if w_count == 1 and m_count == 1:
+            state_node.value = 0
+            state_node.is_leaf = True
+            return True
+        return False
 
     @staticmethod
     def __get_final_states(move_node: MoveNode) -> List[np.ndarray]:
@@ -615,7 +632,3 @@ class StateManager:
     @staticmethod
     def reverse_state(state):
         return 6 - np.flip(state)
-
-
-
-
