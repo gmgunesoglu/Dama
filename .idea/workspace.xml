@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Oyunun zorluk seviyesi ile ilgili problem düzeltildi.">
+    <list default="true" id="c4f6df03-e35f-402d-a2c6-45f896a3e72c" name="Changes" comment="Durum türetmeyle ilgili düzeltmeler yapıldı. Oyun sonu durumları eklendi. Oyun sonu ile ilgili menü eklendi.">
+      <change afterPath="$PROJECT_DIR$/back_end/dao.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/dto.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/back_end/entity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back_end/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui/main_window.py" afterDir="false" />
@@ -50,22 +53,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Python.dto.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.main_window.executor": "Run",
-    "Python.service (1).executor": "Run",
-    "Python.state_generator.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.test_gui.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/Gokhan/Projects/Python/YapayZeka/dama2"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Python.dto.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main_window.executor&quot;: &quot;Run&quot;,
+    &quot;Python.service (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.state_generator.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_gui.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Gokhan/Projects/Python/Gmg_English&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.pycharm.community.ide.impl.configuration.PythonContentEntriesConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Gokhan\Projects\Python\Dama" />
@@ -288,7 +292,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733380951217</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Durum türetmeyle ilgili düzeltmeler yapıldı. Oyun sonu durumları eklendi. Oyun sonu ile ilgili menü eklendi.">
+      <option name="closed" value="true" />
+      <created>1733413446376</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1733413446376</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -326,6 +338,7 @@
     <MESSAGE value="Karşı tarafın hamlesinin izi takip edilebilir hale getirildi" />
     <MESSAGE value="Menü eklendi. Oyunun zorluk seviyesi ile ilgili problem düzeltilecek" />
     <MESSAGE value="Oyunun zorluk seviyesi ile ilgili problem düzeltildi." />
-    <option name="LAST_COMMIT_MESSAGE" value="Oyunun zorluk seviyesi ile ilgili problem düzeltildi." />
+    <MESSAGE value="Durum türetmeyle ilgili düzeltmeler yapıldı. Oyun sonu durumları eklendi. Oyun sonu ile ilgili menü eklendi." />
+    <option name="LAST_COMMIT_MESSAGE" value="Durum türetmeyle ilgili düzeltmeler yapıldı. Oyun sonu durumları eklendi. Oyun sonu ile ilgili menü eklendi." />
   </component>
 </project>

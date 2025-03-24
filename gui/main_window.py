@@ -5,7 +5,7 @@ import sys
 from enum import Enum
 import numpy as np
 # from back_end.dto import
-from back_end.service import Board, StateManager, MoveNode, StateNode
+from back_end.service import Board, StateManager, MoveNodeDTO, StateNodeDTO
 from typing import List
 
 
@@ -46,27 +46,27 @@ is_game_continue = True
 game_result: str = ""
 
 
-state =  np.array([
-                [3, 3, 3, 3, 3, 3, 2, 3],
-                [3, 3, 3, 3, 3, 3, 3, 3],
-                [3, 3, 3, 3, 3, 3, 3, 3],
-                [3, 3, 3, 3, 3, 3, 3, 2],
-                [3, 3, 3, 3, 3, 3, 3, 3],
-                [3, 3, 3, 3, 3, 3, 3, 3],
-                [3, 3, 3, 3, 3, 3, 3, 3],
-                [2, 3, 3, 3, 3, 3, 3, 4],
-            ], dtype=int)
-# board = Board(state, False)
 # state =  np.array([
-#                 [3, 3, 3, 3, 3, 3, 3, 3],
-#                 [1, 1, 1, 1, 1, 1, 1, 1],
-#                 [1, 1, 1, 1, 1, 1, 1, 1],
+#                 [3, 3, 3, 3, 3, 3, 2, 3],
 #                 [3, 3, 3, 3, 3, 3, 3, 3],
 #                 [3, 3, 3, 3, 3, 3, 3, 3],
-#                 [5, 5, 5, 5, 5, 5, 5, 5],
-#                 [5, 5, 5, 5, 5, 5, 5, 5],
+#                 [3, 3, 3, 3, 3, 3, 3, 2],
 #                 [3, 3, 3, 3, 3, 3, 3, 3],
+#                 [3, 3, 3, 3, 3, 3, 3, 3],
+#                 [3, 3, 3, 3, 3, 3, 3, 3],
+#                 [2, 3, 3, 3, 3, 3, 3, 4],
 #             ], dtype=int)
+# board = Board(state, False)
+state =  np.array([
+                [3, 3, 3, 3, 3, 3, 3, 3],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1],
+                [3, 3, 3, 3, 3, 3, 3, 3],
+                [3, 3, 3, 3, 3, 3, 3, 3],
+                [5, 5, 5, 5, 5, 5, 5, 5],
+                [5, 5, 5, 5, 5, 5, 5, 5],
+                [3, 3, 3, 3, 3, 3, 3, 3],
+            ], dtype=int)
 board: Board
 state_manager: StateManager
 mark_of_ai_move: List[tuple[int, int]] = []
@@ -209,7 +209,7 @@ def mark_ai_move():
         screen.blit(overlay_surface, (0, 0))
 
 
-def get_trace_of_move(move_node: MoveNode, target_state: np.ndarray):
+def get_trace_of_move(move_node: MoveNodeDTO, target_state: np.ndarray):
     if np.array_equal(move_node.next_state, target_state):
         return True
     for next_node in move_node.next_nodes:

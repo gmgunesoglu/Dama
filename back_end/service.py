@@ -1,84 +1,23 @@
 """
-    Bu modülün amacı: bir durumdan türeyebilecek diğer durumları bulmaktır.
+    Bu servisin amacı: bir durumdan türeyebilecek diğer durumları bulmaktır.
 
     Algoritması diyagram olarak verilmiştir.
 
     Sadece beyaz taşlar üzerinden hesaplama yapar, dolayısıyla oyuncu sırasının değişmesi durumunda,
     state in simetrisi referans alınır.
 """
+
 from __future__ import annotations
-
-# from back_end.dto import Board, SquareType, MoveNode
-from typing import List, Dict, Tuple
-from enum import Enum
+from back_end.dto import StateNodeDTO, MoveNodeDTO, SCORE_DICT
+from typing import List, Dict
 import numpy as np
-
-
-class MoveNode:
-    def __init__(self, next_state, init_loc: tuple[int, int], next_loc: tuple[int, int]):
-        self.next_state = next_state
-        self.init_loc = init_loc
-        self.next_loc = next_loc
-        self.next_nodes: List[MoveNode] = []
-
-
-class StateNode:
-    def __init__(self, value: int, state: np.ndarray, father: StateNode | None = None, is_leaf: bool = False):
-        self.value = value
-        self.state = state
-        self.father = father
-        self.is_leaf = is_leaf
-
-
-SCORE_DICT = {
-    1: np.array([
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [-15, -10, -10, -10, -10, -10, -10, -15],
-        [-18, -12, -12, -12, -12, -12, -12, -18],
-        [-21, -14, -14, -14, -14, -14, -14, -21],
-        [-24, -16, -16, -16, -16, -16, -16, -24],
-        [-27, -18, -18, -18, -18, -18, -18, -27],
-        [-30, -20, -20, -20, -20, -20, -20, -30],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-    ], dtype=int),
-    2: np.array([
-        [-64, -48, -48, -48, -48, -48, -48, -64],
-        [-48, -32, -32, -32, -32, -32, -32, -48],
-        [-48, -32, -32, -32, -32, -32, -32, -48],
-        [-48, -32, -32, -32, -32, -32, -32, -48],
-        [-48, -32, -32, -32, -32, -32, -32, -48],
-        [-48, -32, -32, -32, -32, -32, -32, -48],
-        [-48, -32, -32, -32, -32, -32, -32, -48],
-        [-64, -48, -48, -48, -48, -48, -48, -64],
-    ], dtype=int),
-    4: np.array([
-        [64, 48, 48, 48, 48, 48, 48, 64],
-        [48, 32, 32, 32, 32, 32, 32, 48],
-        [48, 32, 32, 32, 32, 32, 32, 48],
-        [48, 32, 32, 32, 32, 32, 32, 48],
-        [48, 32, 32, 32, 32, 32, 32, 48],
-        [48, 32, 32, 32, 32, 32, 32, 48],
-        [48, 32, 32, 32, 32, 32, 32, 48],
-        [64, 48, 48, 48, 48, 48, 48, 64],
-    ], dtype=int),
-    5: np.array([
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [30, 20, 20, 20, 20, 20, 20, 30],
-        [27, 18, 18, 18, 18, 18, 18, 27],
-        [24, 16, 16, 16, 16, 16, 16, 24],
-        [21, 14, 14, 14, 14, 14, 14, 21],
-        [18, 12, 12, 12, 12, 12, 12, 18],
-        [15, 10, 10, 10, 10, 10, 10, 15],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-    ], dtype=int),
-}
 
 
 class Board:
     def __init__(self, state: np.array, turn_on_first_player: bool):
         self.turn_on_first_player = turn_on_first_player
         self.state = state
-        self.moves: Dict[tuple[int, int], List[MoveNode]] = {}
+        self.moves: Dict[tuple[int, int], List[MoveNodeDTO]] = {}
         if turn_on_first_player:
             self.is_enemy = lambda n: n < 3
             self.super_piece = 4
@@ -92,7 +31,7 @@ class Board:
         self.state = state
 
     def update_moves(self):
-        moves: Dict[tuple[int, int]: List[MoveNode]]
+        moves: Dict[tuple[int, int]: List[MoveNodeDTO]]
         indexes_of_pieces: np.ndarray
         indexes_of_super_pieces: np.ndarray
         if self.turn_on_first_player:
@@ -151,8 +90,8 @@ class Board:
         return indexes_of_pieces_that_have_to_move, indexes_of_super_pieces_that_have_to_move
 
     def __find_normal_moves(self, indexes_of_pieces: np.ndarray, indexes_of_super_pieces: np.ndarray)\
-            -> Dict[tuple[int, int], List[MoveNode]]:
-        moves: Dict[tuple[int, int], List[MoveNode]] = {}
+            -> Dict[tuple[int, int], List[MoveNodeDTO]]:
+        moves: Dict[tuple[int, int], List[MoveNodeDTO]] = {}
         """ Normal taşın normal hamleleri, """
         for y, x in indexes_of_pieces:
             x, y = int(x), int(y)
@@ -170,7 +109,7 @@ class Board:
                     next_state[0][x] = 4
                 else:
                     next_state[y - 1][x] = 5
-                move = MoveNode(next_state, (x, y), (x, y - 1))
+                move = MoveNodeDTO(next_state, (x, y), (x, y - 1))
                 moves[(x, y)].append(move)
             if not self.turn_on_first_player and self.__down_is_free(x, y):
                 next_state = self.state.copy()
@@ -179,7 +118,7 @@ class Board:
                     next_state[7][x] = 2
                 else:
                     next_state[y + 1][x] = 1
-                move = MoveNode(next_state, (x, y), (x, y + 1))
+                move = MoveNodeDTO(next_state, (x, y), (x, y + 1))
                 moves[(x, y)].append(move)
         """ Dama taşının normal hamleleri """
         for y, x in indexes_of_super_pieces:
@@ -192,18 +131,18 @@ class Board:
 
         return moves
 
-    def __get_normal_move(self, init_loc: tuple[int, int], next_loc: tuple[int, int]) -> MoveNode:
+    def __get_normal_move(self, init_loc: tuple[int, int], next_loc: tuple[int, int]) -> MoveNodeDTO:
         next_state = self.state.copy()
         next_state[next_loc[1]][next_loc[0]] = next_state[init_loc[1]][init_loc[0]]
         next_state[init_loc[1]][init_loc[0]] = 3
-        return MoveNode(next_state, init_loc, next_loc)
+        return MoveNodeDTO(next_state, init_loc, next_loc)
 
     def __find_mandatory_moves(self,
                                indexes_of_pieces_that_have_to_move: List[tuple[int, int]],
                                indexes_of_super_pieces_that_have_to_move: List[tuple[int, int]]) \
-            -> Dict[tuple[int, int], List[MoveNode]]:
+            -> Dict[tuple[int, int], List[MoveNodeDTO]]:
 
-        moves: Dict[tuple[int, int], List[MoveNode]] = {}
+        moves: Dict[tuple[int, int], List[MoveNodeDTO]] = {}
         max_depth = 0
 
         for x, y in indexes_of_pieces_that_have_to_move:
@@ -236,15 +175,15 @@ class Board:
 
         return moves
 
-    def __get_attack_moves(self, state: np.ndarray, x: int, y: int, depth = 0) -> (List[MoveNode], int):
-        moves: List[MoveNode] = []
+    def __get_attack_moves(self, state: np.ndarray, x: int, y: int, depth = 0) -> (List[MoveNodeDTO], int):
+        moves: List[MoveNodeDTO] = []
         max_depth = depth
         if self.__can_kill_left(state, x, y):
             next_state = state.copy()
             next_state[y][x] = 3
             next_state[y][x - 1] = 3
             next_state[y][x - 2] = self.piece
-            node = MoveNode(next_state, (x, y), (x - 2, y))
+            node = MoveNodeDTO(next_state, (x, y), (x - 2, y))
             node.next_nodes, current_depth = self.__get_attack_moves(next_state, x - 2, y, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
@@ -260,11 +199,11 @@ class Board:
             if y == 2:
                 """ Normal taş en yukarıya ulaştığında dama olur """
                 next_state[0][x] = self.super_piece
-                node = MoveNode(next_state, (x, y), (x, 0))
+                node = MoveNodeDTO(next_state, (x, y), (x, 0))
                 moves.append(node)
                 return moves, depth + 1
             next_state[y - 2][x] = self.piece
-            node = MoveNode(next_state, (x, y), (x, y - 2))
+            node = MoveNodeDTO(next_state, (x, y), (x, y - 2))
             node.next_nodes, current_depth = self.__get_attack_moves(next_state, x, y - 2, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
@@ -278,7 +217,7 @@ class Board:
             next_state[y][x] = 3
             next_state[y][x + 1] = 3
             next_state[y][x + 2] = self.piece
-            node = MoveNode(next_state, (x, y), (x + 2, y))
+            node = MoveNodeDTO(next_state, (x, y), (x + 2, y))
             node.next_nodes, current_depth = self.__get_attack_moves(next_state, x + 2, y, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
@@ -294,11 +233,11 @@ class Board:
             if y == 5:
                 """ Normal taş en aşağıya ulaştığında dama olur """
                 next_state[7][x] = self.super_piece
-                node = MoveNode(next_state, (x, y), (x, 7))
+                node = MoveNodeDTO(next_state, (x, y), (x, 7))
                 moves.append(node)
                 return moves, depth + 1
             next_state[y + 2][x] = self.piece
-            node = MoveNode(next_state, (x, y), (x, y + 2))
+            node = MoveNodeDTO(next_state, (x, y), (x, y + 2))
             node.next_nodes, current_depth = self.__get_attack_moves(next_state, x, y + 2, depth + 1)
             if current_depth == max_depth:
                 moves.append(node)
@@ -309,8 +248,8 @@ class Board:
 
         return moves, max_depth
 
-    def __get_attack_moves_long(self, state: np.ndarray, x: int, y: int, depth = 0) -> (List[MoveNode], int):
-        moves: List[MoveNode] = []
+    def __get_attack_moves_long(self, state: np.ndarray, x: int, y: int, depth = 0) -> (List[MoveNodeDTO], int):
+        moves: List[MoveNodeDTO] = []
         max_depth = depth
 
         """ sola dorğu taş yeme hamelleri """
@@ -325,7 +264,7 @@ class Board:
                 next_state[y][x] = 3
                 next_state[enemy_loc[1]][enemy_loc[0]] = 3
                 next_state[next_y][next_x] = self.super_piece
-                node = MoveNode(next_state, (x, y), (next_x, next_y))
+                node = MoveNodeDTO(next_state, (x, y), (next_x, next_y))
                 node.next_nodes, current_depth = self.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
@@ -346,7 +285,7 @@ class Board:
                 next_state[y][x] = 3
                 next_state[enemy_loc[1]][enemy_loc[0]] = 3
                 next_state[next_y][next_x] = self.super_piece
-                node = MoveNode(next_state, (x, y), (next_x, next_y))
+                node = MoveNodeDTO(next_state, (x, y), (next_x, next_y))
                 node.next_nodes, current_depth = self.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
@@ -367,7 +306,7 @@ class Board:
                 next_state[y][x] = 3
                 next_state[enemy_loc[1]][enemy_loc[0]] = 3
                 next_state[next_y][next_x] = self.super_piece
-                node = MoveNode(next_state, (x, y), (next_x, next_y))
+                node = MoveNodeDTO(next_state, (x, y), (next_x, next_y))
                 node.next_nodes, current_depth = self.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
@@ -388,7 +327,7 @@ class Board:
                 next_state[y][x] = 3
                 next_state[enemy_loc[1]][enemy_loc[0]] = 3
                 next_state[next_y][next_x] = self.super_piece
-                node = MoveNode(next_state, (x, y), (next_x, next_y))
+                node = MoveNodeDTO(next_state, (x, y), (next_x, next_y))
                 node.next_nodes, current_depth = self.__get_attack_moves_long(next_state, next_x, next_y, depth + 1)
                 if current_depth == max_depth:
                     moves.append(node)
@@ -419,8 +358,8 @@ class Board:
             return True
         return False
 
-    def __left_is_free_long(self, x: int, y: int) -> List[MoveNode]:
-        moves: List[MoveNode] = []
+    def __left_is_free_long(self, x: int, y: int) -> List[MoveNodeDTO]:
+        moves: List[MoveNodeDTO] = []
         next_x = x
         while self.__left_is_free(next_x, y):
             next_x -= 1
@@ -428,8 +367,8 @@ class Board:
             moves.append(move)
         return moves
 
-    def __up_is_free_long(self, x: int, y: int) -> List[MoveNode]:
-        moves: List[MoveNode] = []
+    def __up_is_free_long(self, x: int, y: int) -> List[MoveNodeDTO]:
+        moves: List[MoveNodeDTO] = []
         next_y = y
         while self.__up_is_free(x, next_y):
             next_y -= 1
@@ -437,8 +376,8 @@ class Board:
             moves.append(move)
         return moves
 
-    def __right_is_free_long(self, x: int, y: int) -> List[MoveNode]:
-        moves: List[MoveNode] = []
+    def __right_is_free_long(self, x: int, y: int) -> List[MoveNodeDTO]:
+        moves: List[MoveNodeDTO] = []
         next_x = x
         while self.__right_is_free(next_x, y):
             next_x += 1
@@ -446,8 +385,8 @@ class Board:
             moves.append(move)
         return moves
 
-    def __down_is_free_long(self, x: int, y: int) -> List[MoveNode]:
-        moves: List[MoveNode] = []
+    def __down_is_free_long(self, x: int, y: int) -> List[MoveNodeDTO]:
+        moves: List[MoveNodeDTO] = []
         next_y = y
         while self.__down_is_free(x, next_y):
             next_y += 1
@@ -455,11 +394,11 @@ class Board:
             moves.append(move)
         return moves
 
-    def __is_free_long(self, init_loc:  tuple[int, int], next_loc:  tuple[int, int]) -> MoveNode:
+    def __is_free_long(self, init_loc:  tuple[int, int], next_loc:  tuple[int, int]) -> MoveNodeDTO:
         next_state = self.state.copy()
         next_state[init_loc[1]][init_loc[0]] = 3
         next_state[next_loc[1]][next_loc[0]] = self.super_piece
-        return MoveNode(next_state, init_loc, next_loc)
+        return MoveNodeDTO(next_state, init_loc, next_loc)
 
     def __can_kill_left(self, state, x: int, y: int) -> bool:
         """ Seçilen taşın solunda düşman taş var ve onun solu boş """
@@ -524,7 +463,7 @@ class Board:
                 return self.__can_kill_down_long(state, x, y + 1)
 
 
-""" Board dan hamleleri al, durumları türet, hamleleri puanla, """
+""" Board dan hamleleri al, durumları türet, hamleleri puanla(değerlendir), """
 class StateManager:
 
     def __init__(self, board: Board, game_level: int, user_is_first_player: bool):
@@ -533,14 +472,14 @@ class StateManager:
         self.ai_goes_max: bool = not user_is_first_player
 
     # TODO board üzerinden değil state ve hamleler üzerinden çalışmalı
-    def get_ai_moves(self) -> List[StateNode]:
+    def get_ai_moves(self) -> List[StateNodeDTO]:
         """
         state_dict bir tür ağaç, her derinlikte düğümler(state_node) liste olarak tutuluyor
         ağacın yönü uçlardan köke doğru, her düğüm bir üst düğümünü father olarak tanır, hangi
         durumdan türediğini bilir
         """
-        root_state = StateNode(0, self.board.state)
-        state_dict: Dict[int, List[StateNode]] = {0: [root_state]}
+        root_state = StateNodeDTO(None, self.board.state, 0)
+        state_dict: Dict[int, List[StateNodeDTO]] = {0: [root_state]}
         for lvl in range(self.game_level):
             state_dict[lvl + 1] = []
             for root_state in state_dict[lvl]:
@@ -571,8 +510,8 @@ class StateManager:
         first_layer = sorted(first_layer, key=lambda node: node.value, reverse=self.ai_goes_max)
         return first_layer
 
-    def __get_states_of_next_layer(self, root_state: StateNode, layer: int) -> List[StateNode]:
-        next_state_nodes: List[StateNode] = []
+    def __get_states_of_next_layer(self, root_state: StateNodeDTO, layer: int) -> List[StateNodeDTO]:
+        next_state_nodes: List[StateNodeDTO] = []
         if StateManager.__check_if_final_state_and_update_value(root_state):
             return next_state_nodes
 
@@ -594,12 +533,12 @@ class StateManager:
                 final_states += StateManager.__get_final_states(root_move_node)
 
         for final_state in final_states:
-            next_state_nodes.append(StateNode(0, final_state, root_state))
+            next_state_nodes.append(StateNodeDTO(root_state, final_state, 0))
 
         return next_state_nodes
 
     @staticmethod
-    def __check_if_final_state_and_update_value(state_node: StateNode) -> bool:
+    def __check_if_final_state_and_update_value(state_node: StateNodeDTO) -> bool:
         # beyazın yenmesi
         w_count = np.sum((state_node.state == 1) | (state_node.state == 2))
         if w_count == 0:
@@ -620,7 +559,7 @@ class StateManager:
         return False
 
     @staticmethod
-    def __get_final_states(move_node: MoveNode) -> List[np.ndarray]:
+    def __get_final_states(move_node: MoveNodeDTO) -> List[np.ndarray]:
         final_states: List[np.ndarray] = []
         if len(move_node.next_nodes) == 0:
             final_states.append(move_node.next_state)
