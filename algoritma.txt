@@ -1,0 +1,12 @@
+1) Yapılabilecek hamleleri hesapla (durum dalı oluştur)
+
+2) Hamleleri puanlandır
+
+3) Hamleler için Ram ve DB senkronizasyonu
+
+4) Oyun döngüye girmeyecek şekilde hamle yap.
+
+
+== 4) Oyun döngüye girmeyecek şekilde hamle yap. ==
+Döngü konusu Ram ve DB için farklı ele alınmalı.
+= Döngü konusunun ram deki lojiği =
