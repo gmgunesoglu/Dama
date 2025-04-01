@@ -30,7 +30,7 @@ screen.blit(background, (0, 0))
 
 
 # arka planın üzerine taşlar daire olarak çiziliyor,
-# bu içlemi hızlandırmak için hashmap...
+# bu işlemi hızlandırmak için hashmap...
 PIECE_IMAGE_MAP = {
     5: pygame.transform.scale(pygame.image.load("source/m.png").convert_alpha(), (80, 80)),
     4: pygame.transform.scale(pygame.image.load("source/mm.png").convert_alpha(), (80, 80)),
